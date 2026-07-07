@@ -1,8 +1,10 @@
 package org.example.services.impl;
 
+import org.example.models.Book;
 import org.example.models.Cart;
 import org.example.models.Order;
 import org.example.models.User;
+import org.example.repos.BookRepoInterface;
 import org.example.repos.CartRepoInterface;
 import org.example.repos.OrderRepoInterface;
 import org.example.repos.UserRepoInterface;
@@ -20,12 +22,14 @@ import java.util.stream.Collectors;
 public class OrderService implements OrderServiceInterface {
     private final OrderRepoInterface orderRepo;
     private final CartRepoInterface cartRepo;
+    private final BookRepoInterface bookRepo;
 
 
-    public OrderService(OrderRepoInterface orderRepo, CartRepoInterface cartRepo) {
+    public OrderService(OrderRepoInterface orderRepo, CartRepoInterface cartRepo, BookRepoInterface bookRepo) {
         this.orderRepo = orderRepo;
         this.cartRepo = cartRepo;
 
+        this.bookRepo = bookRepo;
     }
 
     @Override
@@ -34,6 +38,16 @@ public class OrderService implements OrderServiceInterface {
         List<Cart> cartItems = cartRepo.findByUser_Id(user.getId());
         if(cartItems.isEmpty()){
             throw new RuntimeException("Koszyk jest pusty");
+        }
+        for(Cart cartItem : cartItems){
+            Book book = cartItem.getBook();
+            int remainingQuantity=book.getQuantity() - cartItem.getQuantity()-cartItem.getQuantity();
+            if(remainingQuantity<0){
+                throw new RuntimeException("Książka jest niedostępna");
+
+            }
+            book.setQuantity(remainingQuantity);
+            bookRepo.save(book);
         }
         double totalPrice= cartItems.stream().mapToDouble(item->item.getBook().getPrice()* item.getQuantity()).sum();
         String itemsSum = cartItems.stream().map(item->item.getBook().getTitle()+" x"+item.getQuantity()).collect(Collectors.joining("; "));

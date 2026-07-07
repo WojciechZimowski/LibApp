@@ -2,7 +2,9 @@ CREATE TABLE books(
     id TEXT PRIMARY KEY,
     title TEXT,
     author TEXT,
-    price NUMERIC
+    price NUMERIC,
+    quantity INT
+
 
 );
 CREATE TABLE orders(
