@@ -1,4 +1,60 @@
-package org.example.services;
+package org.example.services.impl;
 
-public class OrderService {
+import org.example.models.Cart;
+import org.example.models.Order;
+import org.example.models.User;
+import org.example.repos.CartRepoInterface;
+import org.example.repos.OrderRepoInterface;
+import org.example.repos.UserRepoInterface;
+import org.example.services.OrderServiceInterface;
+import org.example.services.UserServiceInterface;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class OrderService implements OrderServiceInterface {
+    private final OrderRepoInterface orderRepo;
+    private final CartRepoInterface cartRepo;
+
+
+    public OrderService(OrderRepoInterface orderRepo, CartRepoInterface cartRepo) {
+        this.orderRepo = orderRepo;
+        this.cartRepo = cartRepo;
+
+    }
+
+    @Override
+    @Transactional
+    public Order createOrder(User user) {
+        List<Cart> cartItems = cartRepo.findByUser_Id(user.getId());
+        if(cartItems.isEmpty()){
+            throw new RuntimeException("Koszyk jest pusty");
+        }
+        double totalPrice= cartItems.stream().mapToDouble(item->item.getBook().getPrice()* item.getQuantity()).sum();
+        String itemsSum = cartItems.stream().map(item->item.getBook().getTitle()+" x"+item.getQuantity()).collect(Collectors.joining("; "));
+        Order order = Order.builder().user(user).totalPrice(totalPrice).status("PENDING").itemJson(itemsSum).build();
+        Order savedOrder = orderRepo.save(order);
+        cartRepo.deleteByUserId(user.getId());
+        return savedOrder;
+    }
+
+    @Override
+    public Order updateOrder(String userId, String status) {
+        return null;
+    }
+
+    @Override
+    public List<Order> findUserOrder(String userId) {
+        return orderRepo.findByUserId(userId);
+    }
+
+    @Override
+    public Optional<Order> findOrder(String orderId) {
+        return orderRepo.findById(orderId);
+    }
 }
