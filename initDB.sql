@@ -1,46 +1,48 @@
-CREATE TABLE books(
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    author TEXT,
-    price NUMERIC,
-    quantity INT
+CREATE TABLE books (
+                       id TEXT PRIMARY KEY,
+                       title TEXT NOT NULL,
+                       author TEXT,
+                       price NUMERIC(10, 2) NOT NULL,
+                       quantity INT NOT NULL DEFAULT 0
+);
 
+CREATE TABLE users (
+                       id TEXT PRIMARY KEY,
+                       username TEXT UNIQUE NOT NULL,
+                       password TEXT NOT NULL,
+                       role TEXT NOT NULL
+);
 
+CREATE TABLE orders (
+                        id TEXT PRIMARY KEY,
+                        user_id TEXT,
+                        total_price NUMERIC(10, 2),
+                        status TEXT,
+                        items_json TEXT,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
-CREATE TABLE orders(
-    id TEXT PRIMARY KEY,
-    user_id TEXT,
-    total_price NUMERIC,
-    status TEXT,
-    items_json TEXT
+
+CREATE TABLE carts (
+                       id TEXT PRIMARY KEY,
+                       user_id TEXT,
+                       book_id TEXT,
+                       quantity INT NOT NULL DEFAULT 1,
+                       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                       FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
 );
-CREATE TABLE users(
-    id TEXT PRIMARY KEY,
-    username TEXT UNIQUE,
-    password TEXT,
-    role TEXT
-);
-CREATE TABLE carts(
-    id TEXT PRIMARY KEY,
-    user_id TEXT,
-    book_id TEXT,
-    quantity INT,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
-);
+INSERT INTO books (id, title, author, price, quantity) VALUES
+                                                           ('b-001', 'Wiedźmin: Ostatnie Życzenie', 'Andrzej Sapkowski', 44.99, 15),
+                                                           ('b-002', 'Java: Podręcznik doświadczonego programisty', 'Cay S. Horstmann', 89.90, 5),
+                                                           ('b-003', 'Mistrz i Małgorzata', 'Michaił Bułhakow', 34.50, 20),
+                                                           ('b-004', 'Czysty Kod', 'Robert C. Martin', 69.00, 8),
+                                                           ('b-005', 'Dune', 'Frank Herbert', 49.99, 0);
+
 INSERT INTO users (id, username, password, role) VALUES
-                                                     ('u-admin-123', 'admin', '$2a$10$vK3d0q6vL6jVpGZ.i3E9OOBtP.v4d9h9N0fH.XkWVzWwX3A5y2XmG', 'ADMIN'),
-                                                     ('u-user-456', 'user', '$2a$10$E2lS.7m2P0E7Yv8lUvO2..v5/eS4E7H8v6/Yw8pX9zWwX3A5y2XmG', 'USER');
 
+('u-admin', 'admin', '$2a$10$R79Zdf4Z79Dbyx5E4hFmX.qG47P1ZpG77S7i9/8X5i7E1bZ.pGy2q', 'ROLE_ADMIN'),
 
-INSERT INTO books (id, title, author, price) VALUES
-                                                 ('b-001', 'Wiedzmin: Ostatnie Zyczenie', 'Andrzej Sapkowski', 49.99),
-                                                 ('b-002', 'Java: Podrecznik doswiadczonego programisty', 'Cay S. Horstmann', 89.90);
-
+('u-user1', 'jan_kowalski', '$2a$10$R79Zdf4Z79Dbyx5E4hFmX.qG47P1ZpG77S7i9/8X5i7E1bZ.pGy2q', 'ROLE_USER');
 
 INSERT INTO carts (id, user_id, book_id, quantity) VALUES
-    ('c-001', 'u-user-456', 'b-001', 2);
-
-
-INSERT INTO orders (id, user_id, total_price, status, item_json) VALUES
-    ('o-001', 'u-user-456', 89.90, 'PENDING', 'Java: Podrecznik doswiadczonego programisty x1');
+                                                       ('c-001', 'u-user1', 'b-001', 2),
+                                                       ('c-002', 'u-user1', 'b-004', 1);

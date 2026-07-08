@@ -17,6 +17,20 @@ public class BookService implements BookServiceInterface {
 
     @Override
     public Book addBook(Book book) {
+        Optional<Book> existingBook = bookRepo.findById(book.getId());
+
+        if (existingBook.isPresent()) {
+            Book updatedBook = existingBook.get();
+
+            updatedBook.setQuantity(updatedBook.getQuantity() + book.getQuantity());
+
+             if (book.getPrice() > 0) {
+                updatedBook.setPrice(book.getPrice());
+            }
+
+            return bookRepo.save(updatedBook);
+        }
+
         return bookRepo.save(book);
     }
 
