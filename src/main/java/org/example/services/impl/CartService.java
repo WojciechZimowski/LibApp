@@ -28,6 +28,9 @@ public class CartService implements CartServiceInterface {
 
     @Override
     public Cart addToCart(User user, Book book, int quantity) {
+        book.setQuantity(book.getQuantity() - quantity);
+
+        bookRepo.save(book);
         List<Cart> userCart = cartRepo.findByUser_Id(user.getId());
 
         Optional<Cart> existingItem = userCart.stream()
@@ -37,7 +40,7 @@ public class CartService implements CartServiceInterface {
         if (existingItem.isPresent()) {
             Cart cartItem = existingItem.get();
             cartItem.setQuantity(cartItem.getQuantity() + quantity);
-            return cartRepo.save(cartItem); // Hibernate zrobi SQL UPDATE
+            return cartRepo.save(cartItem);
         }
 
         Cart cartItem = Cart.builder()

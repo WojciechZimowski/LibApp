@@ -23,13 +23,4 @@ public class BookController {
     public ResponseEntity<Book>getBookById(@PathVariable String id){
         return bookService.findBookById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
-    @PostMapping
-    public ResponseEntity<Book> createBook(@RequestBody Book book){
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book));
-    }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable String id){
-        bookService.deleteBookById(id);
-        return ResponseEntity.noContent().build();
-    }
 }

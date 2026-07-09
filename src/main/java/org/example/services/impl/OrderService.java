@@ -58,8 +58,11 @@ public class OrderService implements OrderServiceInterface {
     }
 
     @Override
-    public Order updateOrder(String userId, String status) {
-        return null;
+    @Transactional
+    public void updateOrder(String orderId, String status) {
+        Order order = orderRepo.findById(orderId).orElseThrow(()->new IllegalArgumentException("Nie znaleziono zamówienia"));
+        order.setStatus(status);
+        orderRepo.save(order);
     }
 
     @Override
@@ -71,4 +74,6 @@ public class OrderService implements OrderServiceInterface {
     public Optional<Order> findOrder(String orderId) {
         return orderRepo.findById(orderId);
     }
+
+
 }

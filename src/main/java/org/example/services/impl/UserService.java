@@ -1,7 +1,12 @@
 package org.example.services.impl;
 
+import org.example.models.Cart;
+import org.example.models.Order;
 import org.example.models.User;
+import org.example.repos.CartRepoInterface;
 import org.example.repos.UserRepoInterface;
+import org.example.services.CartServiceInterface;
+import org.example.services.OrderServiceInterface;
 import org.example.services.UserServiceInterface;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +18,16 @@ import java.util.Optional;
 @Transactional
 public class UserService implements UserServiceInterface {
     private final UserRepoInterface userRepo;
+    private final OrderServiceInterface orderService;
+   private final CartServiceInterface cartService;
 
 
-    public UserService(UserRepoInterface userRepo) {
+    public UserService(UserRepoInterface userRepo, OrderServiceInterface orderService,  CartServiceInterface cartService) {
         this.userRepo = userRepo;
+        this.orderService = orderService;
+        this.cartService = cartService;
+
+
     }
 
     @Override
@@ -36,6 +47,23 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public void deleteUser(String id) {
+
+        List<Order> userOrders = orderService.findUserOrder(id);
+
+
+        boolean hasUnfinishedOrders = userOrders.stream()
+                .anyMatch(order -> !order.getStatus().equals("FINISHED"));
+
+        if (hasUnfinishedOrders) {
+            throw new IllegalStateException("Nie można usunąć użytkownika! Posiada on aktywne zamówienia.");
+        }
+        List<Cart> cartItems = cartService.findCart(id);
+
+        for (Cart cartItem : cartItems) {
+            cartService.removeFromCart(cartItem.getId());
+        }
+
+
         userRepo.deleteById(id);
     }
 }

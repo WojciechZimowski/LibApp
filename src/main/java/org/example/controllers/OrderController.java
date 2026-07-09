@@ -34,8 +34,5 @@ public class OrderController {
                 .orElseThrow(() -> new RuntimeException("Username not found"));
         return ResponseEntity.ok(orderService.findUserOrder(user.getId()));
     }
-    @PutMapping("/{orderId}/status")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable String orderId, @RequestBody StatusUpdateRequest request) {
-        return ResponseEntity.ok(orderService.updateOrder(orderId, request.status()));
-    }
+
 }
