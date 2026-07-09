@@ -29,8 +29,8 @@ public class PaymentController {
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl("http://localhost:3067/api/payments/success?orderId=" + orderId)
-                    .setCancelUrl("http://localhost:3067/api/payments/cancel")
+                    .setSuccessUrl("https://libapp-gfgh.onrender.com/api/payments/success?orderId=" + orderId)
+                    .setCancelUrl("https://libapp-gfgh.onrender.com/api/payments/cancel")
                     .addLineItem(
                             SessionCreateParams.LineItem.builder()
                                     .setQuantity(1L)
