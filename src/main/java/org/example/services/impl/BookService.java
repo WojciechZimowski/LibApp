@@ -17,7 +17,13 @@ public class BookService implements BookServiceInterface {
 
     @Override
     public Book addBook(Book book) {
-        Optional<Book> existingBook = bookRepo.findById(book.getId());
+
+        if (book.getId() == null || book.getId().isBlank()) {
+            book.setId(java.util.UUID.randomUUID().toString());
+            return bookRepo.save(book);
+        }
+
+       Optional<Book> existingBook = bookRepo.findById(book.getId());
 
         if (existingBook.isPresent()) {
             Book updatedBook = existingBook.get();
@@ -31,7 +37,7 @@ public class BookService implements BookServiceInterface {
             return bookRepo.save(updatedBook);
         }
 
-        return bookRepo.save(book);
+         return bookRepo.save(book);
     }
 
     @Override
