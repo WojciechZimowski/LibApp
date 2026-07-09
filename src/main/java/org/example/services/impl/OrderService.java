@@ -60,8 +60,12 @@ public class OrderService implements OrderServiceInterface {
     @Override
     @Transactional
     public void updateOrder(String orderId, String status) {
+        if (!"FINISHED".equals(status)) {
+            throw new IllegalArgumentException("Niedozwolony status! Ta operacja pozwala wyłącznie na ustawienie statusu FINISHED.");
+        }
         Order order = orderRepo.findById(orderId).orElseThrow(()->new IllegalArgumentException("Nie znaleziono zamówienia"));
         order.setStatus(status);
+
         orderRepo.save(order);
     }
 
