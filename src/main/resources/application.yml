@@ -1,6 +1,9 @@
 server:
-  port: 8080
+  port: 3067
+
 spring:
+  main:
+    banner-mode: off
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -14,3 +17,11 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+stripe:
+  api:
+    key: ${DB_STRIPE}
+
+jwt:
+  expiration: 86400000
+  secret: ${DB_JWT}
