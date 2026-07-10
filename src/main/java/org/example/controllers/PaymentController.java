@@ -17,6 +17,8 @@ import java.util.Map;
 @RequestMapping("/api/payments")
 public class PaymentController {
     private final OrderServiceInterface orderService;
+    @Value("${APP_URL}")
+    private String appUrl;
 
     public PaymentController(OrderServiceInterface orderService,@Value("${stripe.api.key}") String stripeApiKey) {
         this.orderService = orderService;
@@ -29,7 +31,7 @@ public class PaymentController {
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl("https://libapp-gfgh.onrender.com/api/payments/success?orderId=" + orderId)
+                    .setSuccessUrl(appUrl+"/api/payments/success?orderId=" + orderId)
                     .setCancelUrl("https://libapp-gfgh.onrender.com/api/payments/cancel")
                     .addLineItem(
                             SessionCreateParams.LineItem.builder()
